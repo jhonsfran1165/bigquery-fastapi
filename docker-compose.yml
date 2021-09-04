@@ -1,0 +1,47 @@
+version: "3.4"
+
+networks:
+  whaleandjaguar:
+    external:
+      name: whaleandjaguar.localhost
+
+services:
+  bigquery-db:
+    container_name: bigquery-db
+    image: postgres:12.0
+    networks:
+      default:
+      whaleandjaguar:
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - bigquery_postgres_data:/var/lib/postgresql/data
+
+  bigquery-app:
+    container_name: bigquery-app
+    image: jhonsfran/python-dev:3.7-v2
+    # command: uvicorn --reload --host 0.0.0.0 --port $PORT --log-level $LOG_LEVEL "app.main:app"
+    command: sleep 100000
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+      # jupyter notebook
+      - "8888:8888"
+    expose:
+      - 8000
+      - 8888
+    networks:
+      default:
+      whaleandjaguar:
+    volumes:
+      - .:/opt/app
+      - bigquery_python_dependencies:/opt/app/.venv
+    depends_on:
+      - bigquery-db
+
+volumes:
+  bigquery_python_dependencies:
+  bigquery_postgres_data:
