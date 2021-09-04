@@ -15,4 +15,5 @@ IFS="$(printf "\n\t")"
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+# alembic init alembic
 alembic revision --autogenerate -m "${1}"

@@ -21,12 +21,6 @@ scripts_dir="/opt/scripts"
 
 # TODO
 # in order to avoid changing waitForPostres script export this variables
-# database = os.environ['DB_NAME']
-# user = os.environ['DB_USER']
-# password = os.environ['DB_PASSWORD']
-# host = os.environ['DB_HOST']
-# port = int(os.environ['DB_PORT'])
-
 export DB_NAME="${POSTGRES_DB}"
 export DB_PASSWORD="${POSTGRES_PASSWORD}"
 export DB_USER="${POSTGRES_USER}"

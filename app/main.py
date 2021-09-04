@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from .api.api_v1.api import api_router
-from .core.config import settings
+from app.api.api_v1.api import api_router
+from app.core.config import settings
 
 
 app = FastAPI(
@@ -21,8 +21,3 @@ if settings.BACKEND_CORS_ORIGINS:
 
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello Bigger Applications!"}
