@@ -80,6 +80,9 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = False
 
+    BIGQUERY_CREDENTIALS_FILE: str
+    BIGQUERY_PROJECT_ID: str
+
     class Config:
         case_sensitive = True
 

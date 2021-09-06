@@ -31,10 +31,10 @@ export DB_PORT="${POSTGRES_PORT}"
 python "${scripts_dir}/waitForPostgres.py"
 
 # make migrations
-# alembic upgrade head
+alembic upgrade head
 
 # tell python where is the root path of the project
 export PYTHONPATH="${PYTHONPATH}:/app"
 
 # Create initial data in DB
-# python app/initial_data.py
+python app/initial_data.py
