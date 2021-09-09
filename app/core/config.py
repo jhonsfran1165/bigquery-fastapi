@@ -4,7 +4,7 @@ from pydantic import AnyHttpUrl, BaseSettings, EmailStr, HttpUrl, PostgresDsn, v
 
 
 class Settings(BaseSettings):
-    API_V1_STR: str = "/api/v1"
+    API_PREFIX: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
+
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
@@ -82,6 +83,10 @@ class Settings(BaseSettings):
 
     BIGQUERY_CREDENTIALS_FILE: str
     BIGQUERY_PROJECT_ID: str
+
+    VERSION: str = "v1"
+    DEBUG: bool = False
+
 
     class Config:
         case_sensitive = True

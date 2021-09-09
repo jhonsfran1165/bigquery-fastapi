@@ -3,7 +3,7 @@ from typing import Any, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.place import schemas, actions
+from app.place import schemas, views
 from app.user import models
 from app.api import deps
 
@@ -22,6 +22,5 @@ def read_users(
   """
   Retrieve places from bigquery.
   """
-  places = actions.get_places()
-  print(type(places))
+  places = views.get_places()
   return places
