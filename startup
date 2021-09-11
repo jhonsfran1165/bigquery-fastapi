@@ -28,8 +28,7 @@ export DB_HOST="${POSTGRES_SERVER}"
 export DB_PORT="${POSTGRES_PORT}"
 
 # ensure database config is valid and ready to work
-# TODO: test if work without psycop
-# python "${scripts_dir}/waitForPostgres.py"
+python "${scripts_dir}/waitForPostgres.py"
 
 # make migrations
 alembic upgrade head

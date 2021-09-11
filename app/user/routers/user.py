@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
 from pydantic.networks import EmailStr
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -19,16 +19,16 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[schemas.User])
-def read_users(
+async def read_users(
   db: AsyncSession = Depends(deps.get_db),
   skip: int = 0,
-  limit: int = 100,
+  limit: int = Query(default=100, lte=100),
   current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
   """
   Retrieve users.
   """
-  users = cruds.user.get_multi(db, skip=skip, limit=limit)
+  users = await cruds.user.get_multi(db, skip=skip, limit=limit)
   return users
 
 

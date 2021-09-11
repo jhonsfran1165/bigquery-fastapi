@@ -9,6 +9,10 @@ from sqlmodel import SQLModel
 
 from alembic import context
 
+# TODO: try to find a better way to do this
+# INFO: add every model you want to create with alembic
+from app.user.models.user import User
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -52,7 +56,11 @@ def run_migrations_offline():
 
     """
     # url = config.get_main_option("sqlalchemy.url")
+    print("jhoan es el putas")
+
     url = get_url()
+    print("jhoan es el putas")
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -78,9 +86,12 @@ async def run_migrations_online():
     and associate a connection with the context.
 
     """
+    url = get_url()
+
     connectable = AsyncEngine(
         engine_from_config(
             config.get_section(config.config_ini_section),
+            url=url,
             prefix="sqlalchemy.",
             poolclass=pool.NullPool,
             future=True,

@@ -15,22 +15,28 @@ from app.utils import (
     verify_password_reset_token,
 )
 
-from .user import cruds, models, schemas
+from app.user import cruds, models, schemas
+from app.user.models.token import Token
+from app.user.models.msg import Msg
 
 
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
-def login_access_token(
-    db: AsyncSession = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
+@router.post("/login/access-token", response_model=Token)
+async def login_access_token(
+    db: AsyncSession = Depends(deps.get_db),
+    form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    user = cruds.user.authenticate(
-        db, email=form_data.username, password=form_data.password
+    user = await cruds.user.authenticate(
+        db,
+        email=form_data.username,
+        password=form_data.password
     )
+
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not cruds.user.is_active(user):
@@ -71,8 +77,8 @@ def recover_password(email: str, db: AsyncSession = Depends(deps.get_db)) -> Any
     return {"msg": "Password recovery email sent"}
 
 
-@router.post("/reset-password/", response_model=schemas.Msg)
-def reset_password(
+@router.post("/reset-password/", response_model=Msg)
+async def reset_password(
     token: str = Body(...),
     new_password: str = Body(...),
     db: AsyncSession = Depends(deps.get_db),
@@ -83,7 +89,7 @@ def reset_password(
     email = verify_password_reset_token(token)
     if not email:
         raise HTTPException(status_code=400, detail="Invalid token")
-    user = cruds.user.get_by_email(db, email=email)
+    user = await cruds.user.get_by_email(db, email=email)
     if not user:
         raise HTTPException(
             status_code=404,
@@ -94,5 +100,5 @@ def reset_password(
     hashed_password = get_password_hash(new_password)
     user.hashed_password = hashed_password
     db.add(user)
-    db.commit()
+    await db.commit()
     return {"msg": "Password updated successfully"}

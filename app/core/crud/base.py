@@ -1,13 +1,13 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel
-from sqlmodel import select
+from sqlmodel import select, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
+
 from app.db.base import BaseTable
 
 ModelType = TypeVar("ModelType", bound=BaseTable)
-CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
-UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
+CreateSchemaType = TypeVar("CreateSchemaType", bound=SQLModel)
+UpdateSchemaType = TypeVar("UpdateSchemaType", bound=SQLModel)
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
@@ -22,21 +22,24 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def get(self, db: AsyncSession, id: Any) -> Optional[ModelType]:
+    async def get(self, db: AsyncSession, id: Any) -> Optional[ModelType]:
         # return db.query(self.model).filter(self.model.id == id).first()
-        return db.get(self.model, id)
+        return await db.get(self.model, id)
 
 
-    def get_multi(
+    async def get_multi(
         self, db: AsyncSession, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
-        return db.exec(select(self.model).offset(skip).limit(limit)).all()
+        statement = select(self.model).offset(skip).limit(limit)
+        result = await db.exec(statement)
+        return result.all()
 
     def create(self, db: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
         # TODO: review this
         # .from_orm(hero)
-        obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data)  # type: ignore
+        # obj_in_data = jsonable_encoder(obj_in)
+        # db_obj = self.model.from_orm(obj_in)(**obj_in_data)  # type: ignore
+        db_obj = self.model.from_orm(obj_in)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
