@@ -3,7 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.api import deps
 from app.core import security
@@ -17,12 +17,13 @@ from app.utils import (
 
 from .user import cruds, models, schemas
 
+
 router = APIRouter()
 
 
 @router.post("/login/access-token", response_model=schemas.Token)
 def login_access_token(
-    db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
+    db: AsyncSession = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
     OAuth2 compatible token login, get an access token for future requests
@@ -52,7 +53,7 @@ def test_token(current_user: models.User = Depends(deps.get_current_user)) -> An
 
 
 @router.post("/password-recovery/{email}", response_model=schemas.Msg)
-def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
+def recover_password(email: str, db: AsyncSession = Depends(deps.get_db)) -> Any:
     """
     Password Recovery
     """
@@ -74,7 +75,7 @@ def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
 def reset_password(
     token: str = Body(...),
     new_password: str = Body(...),
-    db: Session = Depends(deps.get_db),
+    db: AsyncSession = Depends(deps.get_db),
 ) -> Any:
     """
     Reset password

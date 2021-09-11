@@ -1,3 +1,24 @@
-# Import all the models, so that Base has them before being
-# imported by Alembic
-from app.db.base_class import Base  # noqa
+from datetime import datetime
+from typing import Optional
+from sqlmodel import Field, SQLModel
+from sqlalchemy import Column, DateTime
+
+
+class BaseTable(SQLModel):
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    created_at: Optional[datetime] = Field(
+        sa_column=Column(
+            DateTime,
+            default=datetime.utcnow,
+            nullable=False,
+        )
+    )
+
+    updated_at: Optional[datetime] = Field(
+        sa_column=Column(
+            DateTime,
+            default=datetime.utcnow,
+            onupdate=datetime.utcnow,
+        )
+    )

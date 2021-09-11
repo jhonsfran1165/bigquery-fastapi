@@ -1,16 +1,28 @@
-from sqlalchemy import Boolean, Column, Integer, String
+from typing import Optional
 
-from app.db.base_class import Base
-from app.db.mixin_class import CommonColumnsMixin
+from pydantic import EmailStr
+from sqlmodel import SQLModel
+
+from app.db.base import BaseTable
 
 
-class User(Base, CommonColumnsMixin):
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean(), default=True)
-    is_superuser = Column(Boolean(), default=False)
+class UserBase(SQLModel):
+    email: Optional[EmailStr] = None
+    is_active: Optional[bool] = True
+    is_superuser: bool = False
+    full_name: Optional[str] = None
 
-    def __str__(self):
-        return self.id
+
+# Properties to receive via API on creation
+class UserCreate(UserBase):
+    email: EmailStr
+    password: str
+
+
+# Properties to receive via API on update
+class UserUpdate(UserBase):
+    password: Optional[str] = None
+
+
+class User(BaseTable, UserBase, table=True):
+    hashed_password : str

@@ -1,23 +1,30 @@
 from typing import Any, List
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.place import schemas, views
-from app.user import models
+from app.user.models.user import User
 from app.api import deps
 
 router = APIRouter(
   prefix="/places"
 )
 
+@router.get("/users", response_model=List[User])
+async def get_songs(db: AsyncSession = Depends(deps.get_db)):
+    result = await db.exec(select(User))
+    songs = result.all()
+    return songs
+
 
 @router.get("/", response_model=List[schemas.Place])
 def read_users(
-  db: Session = Depends(deps.get_db),
+  db: AsyncSession = Depends(deps.get_db),
   skip: int = 0,
   limit: int = 100,
-  current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
   """
   Retrieve places from bigquery.
