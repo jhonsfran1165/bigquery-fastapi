@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.place import schemas, views
+from app.place.models.place import Place
+from app.place.views import place
 from app.user.models.user import User
 from app.api import deps
 
@@ -20,8 +21,8 @@ async def get_songs(db: AsyncSession = Depends(deps.get_db)):
     return songs
 
 
-@router.get("/", response_model=List[schemas.Place])
-def read_users(
+@router.get("/", response_model=List[Place])
+async def read_users(
   db: AsyncSession = Depends(deps.get_db),
   skip: int = 0,
   limit: int = 100,
@@ -29,5 +30,5 @@ def read_users(
   """
   Retrieve places from bigquery.
   """
-  places = views.get_places()
+  places = await place.get_places(limit=limit, skip=skip)
   return places

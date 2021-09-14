@@ -1,8 +1,8 @@
-from pydantic import BaseModel, Json
+from sqlmodel import SQLModel
 
 
 # Shared properties
-class PlaceBase(BaseModel):
+class PlaceBase(SQLModel):
     id: int
     place_id: str
     place_type: str

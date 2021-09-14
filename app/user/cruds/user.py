@@ -6,7 +6,6 @@ from loguru import logger
 
 from app.core.security import get_password_hash, verify_password
 from app.core.crud.base import CRUDBase
-
 from app.user.models.user import User, UserCreate, UserUpdate
 
 
@@ -23,6 +22,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             hashed_password=get_password_hash(obj_in.password),
             full_name=obj_in.full_name,
             is_superuser=obj_in.is_superuser,
+            is_verified=obj_in.is_verified
         )
         db.add(db_obj)
         await db.commit()
@@ -40,7 +40,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
             update_data["hashed_password"] = hashed_password
-        return super().update(db, db_obj=db_obj, obj_in=update_data)
+        return await super().update(db, db_obj=db_obj, obj_in=update_data)
 
     async def authenticate(self, db: AsyncSession, *, email: str, password: str) -> Optional[User]:
         user = await self.get_by_email(db, email=email)
@@ -54,8 +54,13 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def is_active(self, user: User) -> bool:
         return user.is_active
 
+    def is_active(self, user: User) -> bool:
+        return user.is_active
+
+    def is_verified(self, user: User) -> bool:
+        return user.is_verified
+
     def is_superuser(self, user: User) -> bool:
         return user.is_superuser
-
 
 user = CRUDUser(User)

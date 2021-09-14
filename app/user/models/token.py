@@ -9,3 +9,6 @@ class Token(SQLModel):
 
 class TokenPayload(SQLModel):
     sub: Optional[int] = None
+    groups: Optional[list] = None
+    permissions: Optional[list] = None
+
