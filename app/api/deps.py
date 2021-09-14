@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
 from sqlmodel.ext.asyncio.session import AsyncSession
+from fastapi_permissions import Everyone, Authenticated, configure_permissions
 
 from app.user import cruds
 from app.user.models.token import TokenPayload
@@ -42,6 +43,23 @@ async def get_current_user(
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
+async def get_principals(
+    current_user: User = Depends(get_current_user)
+) -> dict:
+    """ returns the principals of the current logged in user"""
+
+    principals = [Everyone]
+
+    if cruds.user.is_active(current_user):
+        # TODO
+        principals = [Everyone, Authenticated]
+
+    return principals
+
+
+# Permission is already wrapped in Depends()
+Permission = configure_permissions(get_principals)
 
 def get_current_active_user(
     current_user: User = Depends(get_current_user),

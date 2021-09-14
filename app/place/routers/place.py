@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends
 
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from fastapi_permissions import Authenticated, Allow
+
 
 from app.place.models.place import Place
 from app.place.views import place
@@ -14,18 +16,19 @@ router = APIRouter(
   prefix="/places"
 )
 
-@router.get("/users", response_model=List[User])
-async def get_songs(db: AsyncSession = Depends(deps.get_db)):
-    result = await db.exec(select(User))
-    songs = result.all()
-    return songs
+acl_places = [
+  (Allow, "admin", "*"),
+  (Allow, "owner", "*"),
+  (Allow, Authenticated, "view")
+]
 
-
+# TODO: https://github.com/holgi/fastapi-permissions/issues/3
 @router.get("/", response_model=List[Place])
 async def read_users(
   db: AsyncSession = Depends(deps.get_db),
   skip: int = 0,
   limit: int = 100,
+  acls: list = deps.Permission("view", acl_places)
 ) -> Any:
   """
   Retrieve places from bigquery.

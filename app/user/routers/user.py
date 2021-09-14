@@ -16,6 +16,17 @@ router = APIRouter(
   prefix="/users"
 )
 
+# https://medium.com/swlh/quickly-make-an-api-with-auth-3e1e0ca695ef
+# TODO
+async def common_parameters(
+  db: AsyncSession = Depends(deps.get_db),
+  skip: int = 0,
+  limit: int = Query(default=100, lte=100),
+  current_user: User = Depends(deps.get_current_active_superuser)
+):
+  return {"db": db, "skip": skip, "limit": limit, "current_user": current_user}
+
+
 
 @router.get("/", response_model=List[User])
 async def read_users(
