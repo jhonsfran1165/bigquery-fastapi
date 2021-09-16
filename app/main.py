@@ -1,14 +1,11 @@
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException
+from loguru import logger
 from starlette.middleware.cors import CORSMiddleware
+from easyauth.client import EasyAuthClient
 
 
-from app.api.errors.http_error import http_error_handler
-from app.api.errors.validation_error import http422_error_handler
-from app.api.api_v1.api import api_router
 from app.core.config import settings
-# from app.db.session import init_db
+from app.api.api_v1.api import api_router_setup
 
 
 def get_application() -> FastAPI:
@@ -26,13 +23,8 @@ def get_application() -> FastAPI:
             allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
             allow_credentials=True,
             allow_methods=["*"],
-            allow_headers=["*"],
+            allow_headers=["*"]
         )
-
-
-    application.include_router(api_router, prefix=settings.API_PREFIX)
-    application.add_exception_handler(HTTPException, http_error_handler)
-    application.add_exception_handler(RequestValidationError, http422_error_handler)
 
     return application
 
@@ -40,13 +32,21 @@ def get_application() -> FastAPI:
 app = get_application()
 
 
-@app.on_event("startup")
-async def on_startup():
-    # await init_db()
-    print("Starting api")
-
-
 @app.on_event("shutdown")
 async def on_shutdown():
-    # await init_db()
-    print("Shotdown api")
+    logger.info("Shotdown api")
+
+
+@app.on_event('startup')
+async def startup():
+    logger.info("Starting api")
+
+    app.auth = await EasyAuthClient.create(
+        app,
+        token_server=settings.TOKEN_SERVER,
+        token_server_port=settings.TOKEN_SERVER_PORT,
+        logger = logger,
+        auth_secret = settings.SECRET_KEY
+    )
+
+    await api_router_setup(app)

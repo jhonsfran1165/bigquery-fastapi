@@ -23,6 +23,7 @@ from app.user.models.user import User
 
 router = APIRouter()
 
+# TODO: https://github.com/IndominusByte/fastapi-jwt-auth/
 
 @router.post("/login/access-token", response_model=Token)
 async def login_access_token(

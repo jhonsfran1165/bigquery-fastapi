@@ -123,3 +123,8 @@ env
 pylint.txt
 .Trash*
 *.json
+
+.rpc_secret
+*.key
+*.pub
+quorum.txt

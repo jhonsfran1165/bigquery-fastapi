@@ -9,9 +9,9 @@ from app.db.base import BaseTable
 class UserBase(SQLModel):
     email: Optional[EmailStr] = None
     is_active: Optional[bool] = True
+    is_verified: bool = False
     is_superuser: bool = False
     full_name: Optional[str] = None
-    is_verified: bool = False
 
 
 # Properties to receive via API on creation

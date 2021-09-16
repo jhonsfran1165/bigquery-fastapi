@@ -22,7 +22,7 @@ python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 asyncpg = "^0.24.0"
 psycopg2-binary = "^2.9.1"
 aiosql = "^3.3.1"
-fastapi_permissions = "^0.2.7"
+easy-auth = {extras = ["client"], version = "^0.148"}
 
 [tool.poetry.dev-dependencies]
 gitlint = "^0.15.1"

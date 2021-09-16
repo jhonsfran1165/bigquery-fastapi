@@ -1,8 +1,11 @@
-from fastapi import APIRouter
-from app.user.routers import user, auth
 from app.place.routers import place
+from app.core.config import settings
 
-api_router = APIRouter()
-api_router.include_router(auth.router, tags=["auth"])
-api_router.include_router(user.router, tags=["users"])
-api_router.include_router(place.router, tags=["places"])
+async def api_router_setup(server):
+  place_auth_router = server.auth.create_api_router(
+    prefix=f"{settings.API_PREFIX}/places",
+    tags=["places"]
+  )
+
+  # send auth routers to setup of each sub-module
+  await place.setup(place_auth_router)

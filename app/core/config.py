@@ -1,7 +1,15 @@
 import os
+import sys
+import logging
 import secrets
+
+from loguru import logger
+
 from typing import Any, Dict, List, Optional, Union
 from pydantic import AnyHttpUrl, BaseSettings, EmailStr, HttpUrl, PostgresDsn, validator
+
+
+from app.core.logging import InterceptHandler
 
 
 class Settings(BaseSettings):
@@ -10,6 +18,8 @@ class Settings(BaseSettings):
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     SERVER_HOST: AnyHttpUrl
+    TOKEN_SERVER: str
+    TOKEN_SERVER_PORT: int
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
@@ -97,6 +107,17 @@ class Settings(BaseSettings):
 
     VERSION: str = "v1"
     DEBUG: bool = False
+
+    LOGGING_LEVEL = logging.DEBUG if DEBUG else logging.INFO
+    LOGGERS = ("uvicorn.asgi", "uvicorn.access")
+
+    logging.getLogger().handlers = [InterceptHandler()]
+
+    for logger_name in LOGGERS:
+        logging_logger = logging.getLogger(logger_name)
+        logging_logger.handlers = [InterceptHandler(level=LOGGING_LEVEL)]
+
+    logger.configure(handlers=[{"sink": sys.stderr, "level": LOGGING_LEVEL}])
 
 
     class Config:

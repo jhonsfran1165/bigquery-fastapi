@@ -8,7 +8,7 @@ networks:
 services:
   bigquery-db:
     container_name: bigquery-db
-    image: postgres:12.0
+    image: postgres:13.0
     networks:
       default:
       whaleandjaguar:

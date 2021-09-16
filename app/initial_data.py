@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 async def init() -> None:
-    # db = [i async for i in get_db()]
     async_session = await get_session()
     async with async_session() as db:
         print(db)
